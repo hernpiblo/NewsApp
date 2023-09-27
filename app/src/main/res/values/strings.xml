@@ -4,4 +4,7 @@
     <string name="search">Search</string>
     <string name="search_for_news">Search for news</string>
     <string name="top_headlines">Top Headlines</string>
+    <string name="search_for">Search for</string>
+    <string name="skip">Skip</string>
+    <string name="sources">Sources</string>
 </resources>

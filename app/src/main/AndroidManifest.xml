@@ -13,7 +13,7 @@
         android:theme="@style/Theme.NewsAppProject"
         tools:targetApi="31">
         <activity
-            android:name=".FineTuneSearchActivity"
+            android:name=".SourcesActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

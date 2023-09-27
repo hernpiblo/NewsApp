@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Init
         searchEditText = findViewById(R.id.SearchEditText)
         searchBtn = findViewById(R.id.SearchButton)
         topHeadlinesBtn = findViewById(R.id.TopHeadlinesButton)
@@ -32,23 +33,23 @@ class MainActivity : AppCompatActivity() {
 
         // Button onClickListeners
         searchBtn.setOnClickListener {
-            Log.d("HomePage - Search button", "Search button clicked")
+            Log.d("HOME PAGE", "BUTTON - Search button clicked")
             if (searchBtn.isEnabled) {
-                val searchResultIntent = Intent(this@MainActivity, FineTuneSearchActivity::class.java)
+                val searchResultIntent = Intent(this@MainActivity, SourcesActivity::class.java)
                 val searchTerm : String = searchEditText.text.toString()
-                Log.d("HomePage - Search button", "Search term: '$searchTerm'")
+                Log.d("HOME PAGE", "SEARCH - Search term: '$searchTerm'")
                 searchResultIntent.putExtra("SearchTerm", searchTerm)
                 startActivity(searchResultIntent)
             }
         }
 
         topHeadlinesBtn.setOnClickListener {
-            Log.d("HomePage - Top Headlines button", "Top Headlines button clicked")
+            Log.d("HOME PAGE", "BUTTON - Top Headlines button clicked")
 
         }
 
         newsByLocationBtn.setOnClickListener {
-            Log.d("HomePage - News By Location button", "News By Location button clicked")
+            Log.d("HOME PAGE", "BUTTON - News By Location button clicked")
 
         }
 
