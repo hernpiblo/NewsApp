@@ -1,13 +1,15 @@
 package com.example.newsappproject
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
-class SourcesAdapter(private val sources: List<Sources>) : RecyclerView.Adapter<SourcesAdapter.ViewHolder>() {
+class SourcesAdapter(val appContext : Context, private val sources: List<Sources>) : RecyclerView.Adapter<SourcesAdapter.ViewHolder>() {
     class ViewHolder(rootLayout: View): RecyclerView.ViewHolder(rootLayout) {
         val sourceName : TextView = rootLayout.findViewById(R.id.sourceName)
         val sourceDescription: TextView = rootLayout.findViewById(R.id.sourceDescription)
@@ -32,6 +34,7 @@ class SourcesAdapter(private val sources: List<Sources>) : RecyclerView.Adapter<
 
         holder.itemView.setOnClickListener {
             Log.d("SOURCE ITEM", "Selected $currentSource")
+            Toast.makeText(appContext, "Selected ${currentSource.name}", Toast.LENGTH_SHORT).show()
         }
     }
 }
