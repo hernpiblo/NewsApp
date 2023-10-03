@@ -26,9 +26,13 @@ class MainActivity : AppCompatActivity() {
         topHeadlinesBtn = findViewById(R.id.TopHeadlinesButton)
         newsByLocationBtn = findViewById(R.id.NewsByLocationButton)
 
+        val sharedPrefsMainActivity = getSharedPreferences("MainActivity", MODE_PRIVATE)
+
 
         // Text Watchers
         searchEditText.addTextChangedListener(textWatcher)
+        searchEditText.setText(sharedPrefsMainActivity.getString("searchTerm", ""))
+        searchBtn.isEnabled = searchEditText.text.toString().isNotBlank()
 
 
         // Button onClickListeners
@@ -38,6 +42,7 @@ class MainActivity : AppCompatActivity() {
                 val searchResultIntent = Intent(this@MainActivity, SourcesActivity::class.java)
                 val searchTerm : String = searchEditText.text.toString()
                 Log.d("HOME PAGE", "SEARCH - Search term: '$searchTerm'")
+                sharedPrefsMainActivity.edit().putString("searchTerm", searchTerm).apply()
                 searchResultIntent.putExtra("SearchTerm", searchTerm)
                 startActivity(searchResultIntent)
             }
