@@ -9,6 +9,8 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 
+private const val LOG_TAG = "HOME PAGE"
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var searchEditText: EditText
@@ -37,11 +39,11 @@ class MainActivity : AppCompatActivity() {
 
         // Button onClickListeners
         searchBtn.setOnClickListener {
-            Log.d("HOME PAGE", "BUTTON - Search button clicked")
+            Log.d(LOG_TAG, "BUTTON - Search button clicked")
             if (searchBtn.isEnabled) {
                 val searchResultIntent = Intent(this@MainActivity, SourcesActivity::class.java)
                 val searchTerm : String = searchEditText.text.toString()
-                Log.d("HOME PAGE", "SEARCH - Search term: '$searchTerm'")
+                Log.d(LOG_TAG, "SEARCH - Search term: '$searchTerm'")
                 sharedPrefsMainActivity.edit().putString("searchTerm", searchTerm).apply()
                 searchResultIntent.putExtra("SearchTerm", searchTerm)
                 startActivity(searchResultIntent)
@@ -49,13 +51,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         topHeadlinesBtn.setOnClickListener {
-            Log.d("HOME PAGE", "BUTTON - Top Headlines button clicked")
+            Log.d(LOG_TAG, "BUTTON - Top Headlines button clicked")
 
         }
 
         newsByLocationBtn.setOnClickListener {
-            Log.d("HOME PAGE", "BUTTON - News By Location button clicked")
-
+            Log.d(LOG_TAG, "BUTTON - News By Location button clicked")
+            val mapsActivityIntent = Intent(this@MainActivity, MapsActivity::class.java)
+            startActivity(mapsActivityIntent)
         }
 
 

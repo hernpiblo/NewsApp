@@ -7,4 +7,10 @@
     <string name="search_for">Search for</string>
     <string name="skip">Skip</string>
     <string name="sources">Sources</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="show_news_for">Show news for</string>
+    <string name="gwu">GWU</string>
+    <string name="thumbnail_of_article">Thumbnail of article</string>
+    <string name="right_angle_bracket">right angle bracket</string>
+    <string name="viewing_news_for">Viewing news for</string>
 </resources>

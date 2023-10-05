@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+private const val LOG_TAG = "SOURCES PAGE"
+
 class SourcesActivity : AppCompatActivity() {
 
     private lateinit var searchTermTextView : TextView
@@ -22,6 +24,8 @@ class SourcesActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sources)
 
         // Init
+        supportActionBar?.title = "Sources"
+
         searchTermTextView = findViewById(R.id.searchTermTextView)
         categoriesSpinner = findViewById(R.id.categoriesSpinner)
         sourcesRecyclerView = findViewById(R.id.sourcesRecyclerView)
@@ -48,13 +52,14 @@ class SourcesActivity : AppCompatActivity() {
 
         // Button
         skipBtn.setOnClickListener {
-            Log.d("SOURCES PAGE", "BUTTON - skip button clicked")
+            Log.d(LOG_TAG, "BUTTON - skip button clicked")
         }
 
     }
 
+
     private fun getSources() : List<Sources> {
-        Log.d("SOURCES PAGE", "API - getSources()")
+        Log.d(LOG_TAG, "API - getSources()")
         return listOf(
             Sources("ABC News (AU)",  "Australia's most trusted source of local, national and world news. Comprehensive, independent, in-depth analysis, the latest business, sport, weather and more."),
             Sources("Ars Technica",  "The PC enthusiast's resource. Power users and the tools they love, without computing religion."),
@@ -66,8 +71,9 @@ class SourcesActivity : AppCompatActivity() {
         )
     }
 
+
     private fun getCategories() : List<String> {
-        Log.d("SOURCES PAGE", "API - getCategories()")
+        Log.d(LOG_TAG, "API - getCategories()")
         return listOf(
             "Business",
             "Entertainment",
