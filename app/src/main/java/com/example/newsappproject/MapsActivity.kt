@@ -1,5 +1,6 @@
 package com.example.newsappproject
 
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.Typeface
 import android.location.Address
@@ -37,11 +38,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var locationTextView: TextView
     private lateinit var articlesRecyclerView: RecyclerView
 
-    private val defaultLocation = LatLng(38.898365, -77.046753) // GWU
-    private val defaultLocationTitle = "GWU"
+    private val defaultLat : Double = 38.898365   //GWU
+    private val defaultLong: Double = -77.046753  //GWU
 
-    private var animationZoom = 10.0f
-    private lateinit var currentAddress : Address
+    private var defaultAnimationZoom = 10.0f
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,37 +75,45 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        mMap.addMarker(MarkerOptions().position(defaultLocation).title(defaultLocationTitle))
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, animationZoom))
-
-        val results = try {
-            val geocoder = Geocoder(this, Locale.getDefault())
-            geocoder.getFromLocation(defaultLocation.latitude, defaultLocation.longitude, 3)
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Geocoding failed", e)
-            listOf<Address>()
-        }
-        if (!results.isNullOrEmpty()) {
-            currentAddress = results[0]
-        }
+        // Set initial map marker
+        setMapMarker(null)
 
         // Map onLongClickListener
         mMap.setOnMapLongClickListener{mapOnLongClick(it)}
-
-        // Button onClickListener
-        locationBtn.setOnClickListener(btnOnClick(currentAddress))
     }
 
 
     private fun mapOnLongClick(it: LatLng) {
         Log.d(LOG_TAG, "Long click at Lat: ${it.latitude}, Long:${it.longitude}.")
+        setMapMarker(it)
+    }
+
+
+    private fun setMapMarker(location: LatLng?) {
 
         mMap.clear()
-        animationZoom = mMap.cameraPosition.zoom
+
+        val sharedPrefsMapsActivity = getSharedPreferences("MapsActivity", MODE_PRIVATE)
+
+        val animationZoom =
+            if (location == null) {
+                defaultAnimationZoom
+            } else {
+                mMap.cameraPosition.zoom
+            }
+
+        val currentLatLng =
+            if (location == null) {
+                val lastUsedLat = sharedPrefsMapsActivity.getDouble("Lat", defaultLat)
+                val lastUsedLong = sharedPrefsMapsActivity.getDouble("Long", defaultLong)
+                LatLng(lastUsedLat, lastUsedLong)
+            } else {
+                location
+            }
 
         val results = try {
             val geocoder = Geocoder(this, Locale.getDefault())
-            geocoder.getFromLocation(it.latitude, it.longitude, 3)
+            geocoder.getFromLocation(currentLatLng.latitude, currentLatLng.longitude, 3)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Geocoding failed", e)
             listOf<Address>()
@@ -120,15 +128,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .setPositiveButton("OK", null)
                 .show()
         } else {
-            currentAddress = results[0]
+            val currentAddress = results[0]
             val addressLine = currentAddress.getAddressLine(0)
-            mMap.addMarker(MarkerOptions().position(it).title(addressLine))
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it, animationZoom))
+
+            mMap.addMarker(MarkerOptions().position(currentLatLng).title(addressLine))
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, animationZoom))
             locationTextView.text = addressLine
 
             // Button onClickListener
             locationBtn.setOnClickListener(btnOnClick(currentAddress))
             setButtonActive(true)
+
+            // SharedPreferences
+            sharedPrefsMapsActivity.edit().putDouble("Lat", currentLatLng.latitude).apply()
+            sharedPrefsMapsActivity.edit().putDouble("Long", currentLatLng.longitude).apply()
+
+            // Button onClickListener
+            locationBtn.setOnClickListener(btnOnClick(currentAddress))
         }
     }
 
@@ -140,8 +156,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             // RecyclerView
             articlesRecyclerView.adapter = ArticlesAdapter(this, articles)
+
             articlesRecyclerView.onFlingListener = null
             LinearSnapHelper().attachToRecyclerView(articlesRecyclerView)
+
             articlesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             articlesRecyclerView.isVisible = true
             setButtonActive(false)
@@ -195,5 +213,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             Article("7 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
             Article("8 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak")
         )
+    }
+
+
+    // Custom function to store Double in sharedPrefs
+    private fun SharedPreferences.Editor.putDouble(key: String, double: Double) : SharedPreferences.Editor {
+        return putLong(key, java.lang.Double.doubleToRawLongBits(double))
+    }
+
+    // Custom function to retrieve Double in sharedPrefs
+    private fun SharedPreferences.getDouble(key: String, default: Double) : Double {
+        return java.lang.Double.longBitsToDouble(getLong(key, java.lang.Double.doubleToRawLongBits(default)))
     }
 }
