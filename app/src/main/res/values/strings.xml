@@ -13,4 +13,14 @@
     <string name="thumbnail_of_article">Thumbnail of article</string>
     <string name="right_angle_bracket">right angle bracket</string>
     <string name="viewing_news_for">Viewing news for</string>
+    <string name="category">Category</string>
+    <string-array name="categories">
+        <item>Business</item>
+        <item>Entertainment</item>
+        <item>General</item>
+        <item>Health</item>
+        <item>Science</item>
+        <item>Sports</item>
+        <item>Technology</item>
+    </string-array>
 </resources>
