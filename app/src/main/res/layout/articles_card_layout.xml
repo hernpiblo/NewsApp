@@ -29,22 +29,25 @@
 
         <ImageView
             android:id="@+id/articleThumbnail"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:contentDescription="@string/thumbnail_of_article"
+            app:layout_constraintBottom_toBottomOf="@+id/articleSource"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@android:drawable/ic_menu_report_image" />
 
         <TextView
             android:id="@+id/articleTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:lines="2"
             android:paddingLeft="4sp"
             android:paddingRight="4sp"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
-            android:textSize="20sp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/articleThumbnail"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Article Title" />
@@ -53,12 +56,16 @@
             android:id="@+id/articleSource"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
             android:lines="1"
             android:paddingLeft="4sp"
             android:paddingRight="4sp"
-            android:textSize="16sp"
+            android:textSize="14sp"
+            android:textStyle="italic"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/articleTitle"
             app:layout_constraintTop_toBottomOf="@+id/articleTitle"
             tools:text="Article Source" />
@@ -67,15 +74,15 @@
             android:id="@+id/articleDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:ellipsize="end"
             android:lines="4"
             android:paddingLeft="4sp"
             android:paddingRight="4sp"
-            android:textSize="16sp"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/articleTitle"
-            app:layout_constraintTop_toBottomOf="@+id/articleSource"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/articleThumbnail"
             tools:text="Article Description" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

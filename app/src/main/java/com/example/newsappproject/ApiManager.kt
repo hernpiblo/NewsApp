@@ -24,7 +24,7 @@ class ApiManager(appContext : Context) {
     }
 
     fun getSources(category : String) : List<Sources> {
-        val url = "https://newsapi.org/v2/top-headlines/sources?category=$category&apiKey=$apiKey"
+        val url = "https://newsapi.org/v2/top-headlines/sources?apiKey=$apiKey&category=$category"
         val request = Request.Builder()
             .url(url)
             .get()
@@ -45,16 +45,52 @@ class ApiManager(appContext : Context) {
                 val currentSourceJson = sourcesJson.getJSONObject(i)
                 val name = currentSourceJson.getString("name")
                 val description = currentSourceJson.getString("description")
+
                 val currentSource = Sources(name, description)
+
                 sources.add(currentSource)
             }
             return sources
         }
     }
 
-    fun getArticles(query : String) :List<Article> {
-        val url = "https://newsapi.org/v2/everything?apiKey=$apiKey"
-        return emptyList()
+    fun getArticles(query : String, source : String ?) :List<Article> {
+        var url = "https://newsapi.org/v2/everything?apiKey=$apiKey&searchIn=title&q=$query"
+
+//        if (source != null) {
+//            url = "$url&source=$source"
+//        }
+
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        val response = okHttpClient.newCall(request).execute()
+        Log.d(LOG_TAG, "getArticles Response: $response")
+        if (!response.isSuccessful) {
+            Log.d(LOG_TAG, "getArticles UNSUCCESSFUL")
+            return emptyList()
+        } else {
+            val responseBody : String ? = response.body?.string()
+            val articlesJson = JSONObject(responseBody).getJSONArray("articles")
+
+            val articles : MutableList<Article> = mutableListOf<Article>()
+
+            for (i in 0 until articlesJson.length()){
+                val currentArticleJson = articlesJson.getJSONObject(i)
+                val title = currentArticleJson.getString("title")
+                val articleSource = currentArticleJson.getJSONObject("source").getString("name")
+                val description = currentArticleJson.getString("description")
+                val thumbnailUrl = currentArticleJson.getString("urlToImage")
+                val articleUrl = currentArticleJson.getString("url")
+
+                val currentArticle = Article(title, articleSource, description, thumbnailUrl, articleUrl)
+
+                articles.add(currentArticle)
+            }
+            return articles
+        }
     }
 
 }

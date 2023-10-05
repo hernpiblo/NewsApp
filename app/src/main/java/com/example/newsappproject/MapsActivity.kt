@@ -25,6 +25,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 
@@ -138,7 +142,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             // Button onClickListener
             locationBtn.setOnClickListener(btnOnClick(currentAddress))
-            setButtonActive(true, currentAddress, null)
+            setButtonActive(true, currentAddress, null, null)
 
             // SharedPreferences
             sharedPrefsMapsActivity.edit().putDouble("Lat", currentLatLng.latitude).apply()
@@ -157,23 +161,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             val country : String = currentAddress.countryName
             val state : String ? = currentAddress.adminArea
             val query = state ?: country
-            val articles = getArticles(query)
 
-            // RecyclerView
-            articlesRecyclerView.adapter = ArticlesAdapter(this, articles)
+            getArticles(query)
 
-            articlesRecyclerView.onFlingListener = null
-            LinearSnapHelper().attachToRecyclerView(articlesRecyclerView)
-
-            articlesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-            articlesRecyclerView.isVisible = true
-
-            setButtonActive(false, currentAddress, query)
+            setButtonActive(false, null, query, getString(R.string.viewing_news_for))
         }
     }
 
 
-    private fun setButtonActive(active : Boolean, address : Address, query: String ?) {
+    private fun setButtonActive(active : Boolean, address : Address ?, query: String ?, disabledText : String ?) {
 
         val black = Color.BLACK
         val white = Color.WHITE
@@ -187,10 +183,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             locationTextView.setTextColor(white)
             locationTextView.setTypeface(null, Typeface.NORMAL)
             locationTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-            locationTextView.text = address.getAddressLine(0)
+            locationTextView.text = address!!.getAddressLine(0)
         } else {
             locationBtn.isEnabled = false
-            locationBtn.text = getString(R.string.viewing_news_for)
+            locationBtn.text = disabledText
             locationBtn.setTextColor(black)
             locationBtn.setBackgroundColor(grey)
             locationTextView.setTextColor(black)
@@ -201,22 +197,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    private fun getArticles(query: String) : List<Article> {
+    private fun getArticles(query: String) {
 
-        Log.d(LOG_TAG, "Get Articles: $query")
+        Log.d(LOG_TAG, "API - getSources($query)")
 
-        val source = "BBC"
+        // Coroutines
+        CoroutineScope(Dispatchers.IO).launch {
+            val articles = ApiManager(this@MapsActivity).getArticles(query, null)
+            if (articles.isEmpty()) {
+                setButtonActive(false, null, query, getString(R.string.no_news_for))
+            } else {
+                withContext(Dispatchers.Main) {
+                    // RecyclerView
+                    articlesRecyclerView.adapter = ArticlesAdapter(this@MapsActivity, articles)
 
-        return listOf(
-            Article("1 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
-            Article("2 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
-            Article("3 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
-            Article("4 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
-            Article("5 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
-            Article("6 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
-            Article("7 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
-            Article("8 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak")
-        )
+                    articlesRecyclerView.onFlingListener = null
+                    LinearSnapHelper().attachToRecyclerView(articlesRecyclerView)
+
+                    articlesRecyclerView.layoutManager = LinearLayoutManager(this@MapsActivity, LinearLayoutManager.HORIZONTAL, false)
+                    articlesRecyclerView.isVisible = true
+                }
+            }
+        }
     }
 
 

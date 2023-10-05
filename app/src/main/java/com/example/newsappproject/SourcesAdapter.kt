@@ -20,7 +20,7 @@ class SourcesAdapter(private val appContext : Context, private val sources: List
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         Log.d(LOG_TAG, "inside onCreateViewHolder")
         val layoutInflater: LayoutInflater = LayoutInflater.from(parent.context)
-        val rootLayout: View = layoutInflater.inflate(R.layout.sourcescardlayout, parent, false)
+        val rootLayout: View = layoutInflater.inflate(R.layout.sources_card_layout, parent, false)
         return ViewHolder(rootLayout)
     }
 

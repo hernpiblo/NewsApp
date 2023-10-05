@@ -67,7 +67,7 @@ class SourcesActivity : AppCompatActivity() {
 
 
     private fun getSources(category : String) {
-        Log.d(LOG_TAG, "API - getSources()")
+        Log.d(LOG_TAG, "API - getSources($category)")
 
         // Coroutines
         CoroutineScope(Dispatchers.IO).launch {
