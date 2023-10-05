@@ -7,6 +7,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -131,13 +132,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             val currentAddress = results[0]
             val addressLine = currentAddress.getAddressLine(0)
 
-            mMap.addMarker(MarkerOptions().position(currentLatLng).title(addressLine))
+            mMap.addMarker(MarkerOptions().position(currentLatLng).title(addressLine))?.showInfoWindow()
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, animationZoom))
             locationTextView.text = addressLine
 
             // Button onClickListener
             locationBtn.setOnClickListener(btnOnClick(currentAddress))
-            setButtonActive(true)
+            setButtonActive(true, currentAddress, null)
 
             // SharedPreferences
             sharedPrefsMapsActivity.edit().putDouble("Lat", currentLatLng.latitude).apply()
@@ -152,7 +153,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun btnOnClick(currentAddress: Address): View.OnClickListener {
         return View.OnClickListener {
             Log.d(LOG_TAG, currentAddress.toString())
-            val articles = getArticles(currentAddress)
+
+            val country : String = currentAddress.countryName
+            val state : String ? = currentAddress.adminArea
+            val query = state ?: country
+            val articles = getArticles(query)
 
             // RecyclerView
             articlesRecyclerView.adapter = ArticlesAdapter(this, articles)
@@ -162,12 +167,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             articlesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             articlesRecyclerView.isVisible = true
-            setButtonActive(false)
+
+            setButtonActive(false, currentAddress, query)
         }
     }
 
 
-    private fun setButtonActive(active : Boolean) {
+    private fun setButtonActive(active : Boolean, address : Address, query: String ?) {
 
         val black = Color.BLACK
         val white = Color.WHITE
@@ -180,6 +186,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             locationBtn.setBackgroundColor(black)
             locationTextView.setTextColor(white)
             locationTextView.setTypeface(null, Typeface.NORMAL)
+            locationTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            locationTextView.text = address.getAddressLine(0)
         } else {
             locationBtn.isEnabled = false
             locationBtn.text = getString(R.string.viewing_news_for)
@@ -187,24 +195,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             locationBtn.setBackgroundColor(grey)
             locationTextView.setTextColor(black)
             locationTextView.setTypeface(null, Typeface.BOLD)
+            locationTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
+            locationTextView.text = query
         }
     }
 
 
-    private fun getArticles(currentAddress: Address) : List<Article> {
+    private fun getArticles(query: String) : List<Article> {
 
-        val country : String = currentAddress.countryName
-        val state : String ? = currentAddress.adminArea
+        Log.d(LOG_TAG, "Get Articles: $query")
 
-        Log.d(LOG_TAG, "Get Articles: country: $country, state: $state.")
+        val source = "BBC"
 
-        val source = if (state.isNullOrBlank()) {
-            "Reuters"
-        } else {
-            "BBC"
-        }
         return listOf(
-            Article("1 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
+            Article("1 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
             Article("2 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
             Article("3 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),
             Article("4 Soccer mens tournament", source, "Soccer mens tournament aaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbcccccccccccccccddddddddddddddddd", "https://img-cdn.tnwcdn.com/image/tnw-blurple?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2023%2F10%2Fseergrills-BBQ.jpg&signature=cd73479302c0cbd19fb9a3c602aff91d","https://thenextweb.com/news/ai-powered-grill-cooks-food-up-to-10x-faster-perfect-steak"),

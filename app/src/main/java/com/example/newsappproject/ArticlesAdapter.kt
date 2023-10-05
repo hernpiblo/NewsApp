@@ -1,6 +1,8 @@
 package com.example.newsappproject
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 private const val LOG_TAG = "ARTICLES ADAPTER"
 
-class ArticlesAdapter(val appContext : Context, private val articles: List<Article>) : RecyclerView.Adapter<ArticlesAdapter.ViewHolder>() {
+class ArticlesAdapter(private val appContext : Context, private val articles: List<Article>) : RecyclerView.Adapter<ArticlesAdapter.ViewHolder>() {
     class ViewHolder(rootLayout: View): RecyclerView.ViewHolder(rootLayout) {
         val articleTitle : TextView = rootLayout.findViewById(R.id.articleTitle)
         val articleSource : TextView = rootLayout.findViewById(R.id.articleSource)
@@ -42,7 +44,15 @@ class ArticlesAdapter(val appContext : Context, private val articles: List<Artic
 
         holder.itemView.setOnClickListener {
             Log.d(LOG_TAG, "Selected $currentArticle")
-            Toast.makeText(appContext, "Selected ${currentArticle.title}", Toast.LENGTH_SHORT).show()
+            val url =
+                if (!currentArticle.url.startsWith("http://") && !currentArticle.url.startsWith("https://")) {
+                    "http://${currentArticle.url}"
+                } else {
+                    currentArticle.url
+                }
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            appContext.startActivity(intent)
+            Toast.makeText(appContext, "Opening in browser: $url", Toast.LENGTH_LONG).show()
         }
     }
 }

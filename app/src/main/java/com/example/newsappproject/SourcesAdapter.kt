@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 private const val LOG_TAG = "SOURCES ADAPTER"
 
-class SourcesAdapter(val appContext : Context, private val sources: List<Sources>) : RecyclerView.Adapter<SourcesAdapter.ViewHolder>() {
+class SourcesAdapter(private val appContext : Context, private val sources: List<Sources>) : RecyclerView.Adapter<SourcesAdapter.ViewHolder>() {
     class ViewHolder(rootLayout: View): RecyclerView.ViewHolder(rootLayout) {
         val sourceName : TextView = rootLayout.findViewById(R.id.articleTitle)
         val sourceDescription: TextView = rootLayout.findViewById(R.id.articleSource)
