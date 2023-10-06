@@ -2,6 +2,7 @@ package com.example.newsappproject
 
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.location.Address
 import android.location.Geocoder
@@ -10,6 +11,7 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -42,6 +44,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var locationBtn : Button
     private lateinit var locationTextView: TextView
     private lateinit var articlesRecyclerView: RecyclerView
+    private lateinit var arrowIcon : ImageView
 
     private val defaultLat : Double = 38.898365   //GWU
     private val defaultLong: Double = -77.046753  //GWU
@@ -65,6 +68,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationBtn = findViewById(R.id.locationButton)
         locationTextView = findViewById(R.id.locationTextView)
         articlesRecyclerView = findViewById(R.id.articlesRecyclerView)
+        arrowIcon = findViewById(R.id.locationButtonIcon)
     }
 
 
@@ -184,15 +188,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             locationTextView.setTypeface(null, Typeface.NORMAL)
             locationTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
             locationTextView.text = address!!.getAddressLine(0)
+            arrowIcon.setColorFilter(grey, PorterDuff.Mode.SRC_IN)
         } else {
             locationBtn.isEnabled = false
             locationBtn.text = disabledText
             locationBtn.setTextColor(black)
-            locationBtn.setBackgroundColor(grey)
+            locationBtn.setBackgroundColor(white)
             locationTextView.setTextColor(black)
             locationTextView.setTypeface(null, Typeface.BOLD)
             locationTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
             locationTextView.text = query
+            arrowIcon.setColorFilter(white, PorterDuff.Mode.SRC_IN)
         }
     }
 
@@ -204,10 +210,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Coroutines
         CoroutineScope(Dispatchers.IO).launch {
             val articles = ApiManager(this@MapsActivity).getArticles(query, null)
-            if (articles.isEmpty()) {
-                setButtonActive(false, null, query, getString(R.string.no_news_for))
-            } else {
-                withContext(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
+                if (articles.isEmpty()) {
+                    setButtonActive(false, null, query, getString(R.string.no_news_for))
+                    articlesRecyclerView.isVisible = false
+                } else {
                     // RecyclerView
                     articlesRecyclerView.adapter = ArticlesAdapter(this@MapsActivity, articles)
 
