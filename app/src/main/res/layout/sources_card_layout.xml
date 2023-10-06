@@ -20,7 +20,7 @@
         will add padding in API v21+ as well to have the same measurements with previous versions -->
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/sourcesViewLayout"
+        android:id="@+id/articlesViewLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="10dp">
@@ -28,7 +28,7 @@
         <!-- ImageVIew to display our Course Image -->
 
         <TextView
-            android:id="@+id/sourceName"
+            android:id="@+id/articleTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
@@ -38,15 +38,15 @@
             tools:text="Source Name" />
 
         <TextView
-            android:id="@+id/sourceDescription"
+            android:id="@+id/articleSource"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:lines="4"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/sourceName"
-            app:layout_constraintTop_toBottomOf="@+id/sourceName"
+            app:layout_constraintStart_toStartOf="@+id/articleTitle"
+            app:layout_constraintTop_toBottomOf="@+id/articleTitle"
             tools:text="Source Description" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

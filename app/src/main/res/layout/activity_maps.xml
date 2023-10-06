@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapsActivity">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:context=".MapsActivity" />
+
+    <Button
+        android:id="@+id/locationButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:elevation="-1dp"
+        android:gravity="center_horizontal|top"
+        android:lines="4"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:text="@string/show_news_for"
+        android:textColor="@android:color/secondary_text_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="380dp" />
+
+    <TextView
+        android:id="@+id/locationTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="38dp"
+        android:layout_marginTop="40dp"
+        android:elevation="5dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/gwu"
+        android:textAlignment="center"
+        android:textAllCaps="true"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toStartOf="@+id/locationButtonIcon"
+        app:layout_constraintStart_toStartOf="@+id/locationButton"
+        app:layout_constraintTop_toTopOf="@+id/locationButton" />
+
+    <ImageView
+        android:id="@+id/locationButtonIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/right_angle_bracket"
+        android:elevation="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/locationButton"
+        app:layout_constraintEnd_toEndOf="@+id/locationButton"
+        app:layout_constraintTop_toTopOf="@+id/locationButton"
+        app:srcCompat="@drawable/rightanglebracket" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/articlesRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/locationButton"
+        app:layout_constraintEnd_toEndOf="@+id/locationButton"
+        app:layout_constraintStart_toStartOf="@+id/locationButton" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
