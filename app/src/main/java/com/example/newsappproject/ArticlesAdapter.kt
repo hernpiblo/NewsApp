@@ -37,9 +37,9 @@ class ArticlesAdapter(private val appContext : Context, private val articles: Li
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Log.d(LOG_TAG, "inside onBindViewHolder on position $position")
         val currentArticle = articles[position]
-        holder.articleTitle.text = currentArticle.title
-        holder.articleSource.text = currentArticle.source
-        holder.articleDescription.text = currentArticle.description
+        holder.articleTitle.text = currentArticle.title.ifBlank { appContext.resources.getString(R.string.no_title) }
+        holder.articleSource.text = currentArticle.source.ifBlank { appContext.resources.getString(R.string.no_source) }
+        holder.articleDescription.text = currentArticle.description.ifBlank { appContext.resources.getString(R.string.no_description) }
 //        holder.articleThumbnail.setImageBitmap(BitmapFactory.decodeStream(new URL(currentArticle.thumbnailUrl).openConnection().getInputStream()));
 
         holder.itemView.setOnClickListener {
