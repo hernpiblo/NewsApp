@@ -1,5 +1,6 @@
 package com.example.newsappproject
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -29,6 +30,8 @@ class SourcesActivity : AppCompatActivity() {
     private lateinit var skipBtn : Button
     private lateinit var progressBar : ProgressBar
 
+    private lateinit var searchTerm : String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sources)
@@ -46,7 +49,7 @@ class SourcesActivity : AppCompatActivity() {
         getSources(resources.getStringArray(R.array.categories)[0])
 
         // Search Result View
-        val searchTerm : String = intent.getStringExtra("SearchTerm").toString()
+        searchTerm = intent.getStringExtra("SearchTerm").toString()
         searchTermTextView.text = searchTerm
 
         // Spinner
@@ -66,6 +69,10 @@ class SourcesActivity : AppCompatActivity() {
         // Button
         skipBtn.setOnClickListener {
             Log.d(LOG_TAG, "BUTTON - skip button clicked")
+            val searchResultIntent = Intent(this@SourcesActivity, SearchResultsActivity::class.java)
+            searchResultIntent.putExtra("SearchTerm", searchTerm)
+                              .putExtra("Source", "")
+            startActivity(searchResultIntent)
         }
     }
 
@@ -80,7 +87,7 @@ class SourcesActivity : AppCompatActivity() {
             val sources = ApiManager(this@SourcesActivity).getSources(category)
             withContext(Dispatchers.Main) {
                 // RecyclerView
-                sourcesRecyclerView.adapter = SourcesAdapter(this@SourcesActivity, sources)
+                sourcesRecyclerView.adapter = SourcesAdapter(this@SourcesActivity, sources, searchTerm)
                 sourcesRecyclerView.layoutManager = LinearLayoutManager(this@SourcesActivity)
 
                 progressBar.isVisible = false

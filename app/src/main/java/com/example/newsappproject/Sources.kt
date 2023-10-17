@@ -2,5 +2,6 @@ package com.example.newsappproject
 
 data class Sources(
     val name : String,
-    val description : String
+    val description : String,
+    val sourceId : String
 )

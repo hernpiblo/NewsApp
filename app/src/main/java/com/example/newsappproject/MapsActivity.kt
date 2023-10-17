@@ -214,7 +214,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Coroutines
         CoroutineScope(Dispatchers.IO).launch {
-            val articles = ApiManager(this@MapsActivity).getArticles(query, null)
+            val articles = ApiManager(this@MapsActivity).getArticles(query, "")
             withContext(Dispatchers.Main) {
                 if (articles.isEmpty()) {
                     setButtonActive(false, null, query, getString(R.string.no_news_for))

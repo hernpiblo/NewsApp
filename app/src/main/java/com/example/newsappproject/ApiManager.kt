@@ -45,8 +45,9 @@ class ApiManager(appContext : Context) {
                 val currentSourceJson = sourcesJson.getJSONObject(i)
                 val name = currentSourceJson.getString("name")
                 val description = currentSourceJson.getString("description")
+                val id = currentSourceJson.getString("id")
 
-                val currentSource = Sources(name, description)
+                val currentSource = Sources(name, description, id)
 
                 sources.add(currentSource)
             }
@@ -54,13 +55,14 @@ class ApiManager(appContext : Context) {
         }
     }
 
-    fun getArticles(query : String, source : String ?) :List<Article> {
-        val url = "https://newsapi.org/v2/everything?apiKey=$apiKey&searchIn=title&q=$query"
-        Log.d(LOG_TAG, url)
+    fun getArticles(query : String, source : String) :List<Article> {
+        var url = "https://newsapi.org/v2/everything?apiKey=$apiKey&searchIn=title&q=$query"
 
-//        if (source != null) {
-//            url = "$url&source=$source"
-//        }
+        if (source.isNotBlank()) {
+            url = "$url&source=$source"
+        }
+
+        Log.d(LOG_TAG, url)
 
         val request = Request.Builder()
             .url(url)
