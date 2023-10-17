@@ -48,6 +48,9 @@ class TopHeadlinesActivity : AppCompatActivity() {
         pageNumberTextView = findViewById(R.id.pageNumberTextView)
         progressBar = findViewById(R.id.progressBar)
 
+        val sharedPrefsTopHeadlinesActivity = getSharedPreferences("TopHeadlinesActivity", MODE_PRIVATE)
+        currentCategory = sharedPrefsTopHeadlinesActivity.getString("category", "").toString()
+
         // Load initial sources list using first category
         initialise()
 
@@ -55,6 +58,7 @@ class TopHeadlinesActivity : AppCompatActivity() {
         val arrayAdapter = ArrayAdapter.createFromResource(this, R.array.categories, android.R.layout.simple_spinner_item)
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categoriesSpinner.adapter = arrayAdapter
+        categoriesSpinner.setSelection(sharedPrefsTopHeadlinesActivity.getInt("categoryPosition", 0))
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 currentCategory = parent.getItemAtPosition(position).toString()
@@ -63,6 +67,8 @@ class TopHeadlinesActivity : AppCompatActivity() {
                 currentPageNumber = 1
                 updatePageNumberText()
                 updateButtonVisibility()
+                sharedPrefsTopHeadlinesActivity.edit().putString("category", currentCategory).apply()
+                sharedPrefsTopHeadlinesActivity.edit().putInt("categoryPosition", position).apply()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -86,7 +92,9 @@ class TopHeadlinesActivity : AppCompatActivity() {
 
 
     private fun initialise() {
-        currentCategory = resources.getStringArray(R.array.categories)[0]
+        if (currentCategory.isBlank()) {
+            currentCategory = resources.getStringArray(R.array.categories)[0]
+        }
         getTopHeadlines(currentCategory, 1)
         updatePageNumberText()
     }
