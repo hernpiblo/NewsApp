@@ -1,14 +1,17 @@
 package com.example.newsappproject
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +28,9 @@ class SourcesActivity : AppCompatActivity() {
     private lateinit var categoriesSpinner : Spinner
     private lateinit var sourcesRecyclerView : RecyclerView
     private lateinit var skipBtn : Button
+    private lateinit var progressBar : ProgressBar
+
+    private lateinit var searchTerm : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +43,13 @@ class SourcesActivity : AppCompatActivity() {
         categoriesSpinner = findViewById(R.id.categoriesSpinner)
         sourcesRecyclerView = findViewById(R.id.sourcesRecyclerView)
         skipBtn = findViewById(R.id.skipButton)
+        progressBar = findViewById(R.id.progressBar)
 
         // Load initial sources list using first category
         getSources(resources.getStringArray(R.array.categories)[0])
 
         // Search Result View
-        val searchTerm : String = intent.getStringExtra("SearchTerm").toString()
+        searchTerm = intent.getStringExtra("SearchTerm").toString()
         searchTermTextView.text = searchTerm
 
         // Spinner
@@ -62,6 +69,10 @@ class SourcesActivity : AppCompatActivity() {
         // Button
         skipBtn.setOnClickListener {
             Log.d(LOG_TAG, "BUTTON - skip button clicked")
+            val searchResultIntent = Intent(this@SourcesActivity, SearchResultsActivity::class.java)
+            searchResultIntent.putExtra("SearchTerm", searchTerm)
+                              .putExtra("Source", "")
+            startActivity(searchResultIntent)
         }
     }
 
@@ -69,13 +80,17 @@ class SourcesActivity : AppCompatActivity() {
     private fun getSources(category : String) {
         Log.d(LOG_TAG, "API - getSources($category)")
 
+        progressBar.isVisible = true
+
         // Coroutines
         CoroutineScope(Dispatchers.IO).launch {
             val sources = ApiManager(this@SourcesActivity).getSources(category)
             withContext(Dispatchers.Main) {
                 // RecyclerView
-                sourcesRecyclerView.adapter = SourcesAdapter(this@SourcesActivity, sources)
+                sourcesRecyclerView.adapter = SourcesAdapter(this@SourcesActivity, sources, searchTerm)
                 sourcesRecyclerView.layoutManager = LinearLayoutManager(this@SourcesActivity)
+
+                progressBar.isVisible = false
             }
         }
     }

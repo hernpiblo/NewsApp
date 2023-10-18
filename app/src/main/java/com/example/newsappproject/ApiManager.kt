@@ -45,8 +45,9 @@ class ApiManager(appContext : Context) {
                 val currentSourceJson = sourcesJson.getJSONObject(i)
                 val name = currentSourceJson.getString("name")
                 val description = currentSourceJson.getString("description")
+                val id = currentSourceJson.getString("id")
 
-                val currentSource = Sources(name, description)
+                val currentSource = Sources(name, description, id)
 
                 sources.add(currentSource)
             }
@@ -54,12 +55,14 @@ class ApiManager(appContext : Context) {
         }
     }
 
-    fun getArticles(query : String, source : String ?) :List<Article> {
+    fun getArticles(query : String, source : String) :List<Article> {
         var url = "https://newsapi.org/v2/everything?apiKey=$apiKey&searchIn=title&q=$query"
 
-//        if (source != null) {
-//            url = "$url&source=$source"
-//        }
+        if (source.isNotBlank()) {
+            url = "$url&source=$source"
+        }
+
+        Log.d(LOG_TAG, url)
 
         val request = Request.Builder()
             .url(url)
@@ -93,4 +96,60 @@ class ApiManager(appContext : Context) {
         }
     }
 
+
+    fun getTopHeadlines(category : String, pageNumber : Int) :List<Article> {
+        val url = "https://newsapi.org/v2/top-headlines?country=us&apiKey=$apiKey&category=${category.lowercase()}&page=$pageNumber"
+        Log.d(LOG_TAG, url)
+
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        val response = okHttpClient.newCall(request).execute()
+        Log.d(LOG_TAG, "getTopHeadlines Response: $response")
+        if (!response.isSuccessful) {
+            Log.d(LOG_TAG, "getTopHeadlines UNSUCCESSFUL")
+            return emptyList()
+        } else {
+            val responseBody : String ? = response.body?.string()
+            val articlesJson = JSONObject(responseBody).getJSONArray("articles")
+
+            val articles : MutableList<Article> = mutableListOf<Article>()
+
+            for (i in 0 until articlesJson.length()){
+                val currentArticleJson = articlesJson.getJSONObject(i)
+                val title = currentArticleJson.getString("title")
+                val articleSource = currentArticleJson.getJSONObject("source").getString("name")
+                val description = currentArticleJson.getString("description")
+                val thumbnailUrl = currentArticleJson.getString("urlToImage")
+                val articleUrl = currentArticleJson.getString("url")
+
+                val currentArticle = Article(title, articleSource, description, thumbnailUrl, articleUrl)
+
+                articles.add(currentArticle)
+            }
+            return articles
+        }
+    }
+
+    fun getNumResults(category : String) :Int {
+        val url = "https://newsapi.org/v2/top-headlines?country=us&apiKey=$apiKey&category=${category.lowercase()}"
+        Log.d(LOG_TAG, url)
+
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        val response = okHttpClient.newCall(request).execute()
+        Log.d(LOG_TAG, "getNumResults Response: $response")
+        if (!response.isSuccessful) {
+            Log.d(LOG_TAG, "getNumResults UNSUCCESSFUL")
+            return 0
+        } else {
+            val responseBody : String ? = response.body?.string()
+            return JSONObject(responseBody).getInt("totalResults")
+        }
+    }
 }

@@ -12,6 +12,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -45,6 +46,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var locationTextView: TextView
     private lateinit var articlesRecyclerView: RecyclerView
     private lateinit var arrowIcon : ImageView
+    private lateinit var progressBar : ProgressBar
 
     private val defaultLat : Double = 38.898365   //GWU
     private val defaultLong: Double = -77.046753  //GWU
@@ -69,6 +71,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationTextView = findViewById(R.id.locationTextView)
         articlesRecyclerView = findViewById(R.id.articlesRecyclerView)
         arrowIcon = findViewById(R.id.locationButtonIcon)
+        progressBar = findViewById(R.id.progressBar)
     }
 
 
@@ -205,11 +208,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun getArticles(query: String) {
 
-        Log.d(LOG_TAG, "API - getSources($query)")
+        Log.d(LOG_TAG, "API - getArticles($query)")
+
+        progressBar.isVisible = true
 
         // Coroutines
         CoroutineScope(Dispatchers.IO).launch {
-            val articles = ApiManager(this@MapsActivity).getArticles(query, null)
+            val articles = ApiManager(this@MapsActivity).getArticles(query, "")
             withContext(Dispatchers.Main) {
                 if (articles.isEmpty()) {
                     setButtonActive(false, null, query, getString(R.string.no_news_for))
@@ -224,6 +229,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     articlesRecyclerView.layoutManager = LinearLayoutManager(this@MapsActivity, LinearLayoutManager.HORIZONTAL, false)
                     articlesRecyclerView.isVisible = true
                 }
+                progressBar.isVisible = false
             }
         }
     }

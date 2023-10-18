@@ -52,7 +52,8 @@ class MainActivity : AppCompatActivity() {
 
         topHeadlinesBtn.setOnClickListener {
             Log.d(LOG_TAG, "BUTTON - Top Headlines button clicked")
-
+            val topHeadlinesActivityIntent = Intent(this@MainActivity, TopHeadlinesActivity::class.java)
+            startActivity(topHeadlinesActivityIntent)
         }
 
         newsByLocationBtn.setOnClickListener {
@@ -60,8 +61,6 @@ class MainActivity : AppCompatActivity() {
             val mapsActivityIntent = Intent(this@MainActivity, MapsActivity::class.java)
             startActivity(mapsActivityIntent)
         }
-
-
     }
 
     private val textWatcher : TextWatcher = object : TextWatcher {

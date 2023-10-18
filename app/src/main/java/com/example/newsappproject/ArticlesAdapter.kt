@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 
 
 private const val LOG_TAG = "ARTICLES ADAPTER"
@@ -39,8 +40,19 @@ class ArticlesAdapter(private val appContext : Context, private val articles: Li
         val currentArticle = articles[position]
         holder.articleTitle.text = currentArticle.title.ifBlank { appContext.resources.getString(R.string.no_title) }
         holder.articleSource.text = currentArticle.source.ifBlank { appContext.resources.getString(R.string.no_source) }
-        holder.articleDescription.text = currentArticle.description.ifBlank { appContext.resources.getString(R.string.no_description) }
-//        holder.articleThumbnail.setImageBitmap(BitmapFactory.decodeStream(new URL(currentArticle.thumbnailUrl).openConnection().getInputStream()));
+        holder.articleDescription.text = if (currentArticle.description.isBlank() || currentArticle.description == "null") {
+            appContext.resources.getString(R.string.no_description)
+        } else {
+            currentArticle.description
+        }
+        if (currentArticle.thumbnailUrl.isNotEmpty()) {
+            if (currentArticle.thumbnailUrl == "null") {
+                holder.articleThumbnail.setImageResource(R.drawable.no_icon)
+            } else {
+                Picasso.get().setIndicatorsEnabled(true)
+                Picasso.get().load(currentArticle.thumbnailUrl).into(holder.articleThumbnail)
+            }
+        }
 
         holder.itemView.setOnClickListener {
             Log.d(LOG_TAG, "Selected $currentArticle")
