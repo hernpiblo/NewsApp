@@ -1,14 +1,26 @@
 package com.example.newsappproject
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+
+private const val LOG_TAG = "SOURCES PAGE"
 
 class SourcesActivity : AppCompatActivity() {
 
@@ -16,66 +28,70 @@ class SourcesActivity : AppCompatActivity() {
     private lateinit var categoriesSpinner : Spinner
     private lateinit var sourcesRecyclerView : RecyclerView
     private lateinit var skipBtn : Button
+    private lateinit var progressBar : ProgressBar
+
+    private lateinit var searchTerm : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sources)
 
         // Init
+        supportActionBar?.title = "Sources"
+
         searchTermTextView = findViewById(R.id.searchTermTextView)
         categoriesSpinner = findViewById(R.id.categoriesSpinner)
         sourcesRecyclerView = findViewById(R.id.sourcesRecyclerView)
         skipBtn = findViewById(R.id.skipButton)
+        progressBar = findViewById(R.id.progressBar)
+
+        // Load initial sources list using first category
+        getSources(resources.getStringArray(R.array.categories)[0])
 
         // Search Result View
-        val searchTerm : String = intent.getStringExtra("SearchTerm").toString()
+        searchTerm = intent.getStringExtra("SearchTerm").toString()
         searchTermTextView.text = searchTerm
 
         // Spinner
-        val arrayAdapter : ArrayAdapter<String> = ArrayAdapter<String>(
-            this,
-            android.R.layout.simple_list_item_1,
-            getCategories()
-        )
+        val arrayAdapter = ArrayAdapter.createFromResource(this, R.array.categories, android.R.layout.simple_spinner_item)
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categoriesSpinner.adapter = arrayAdapter
+        categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val category = parent.getItemAtPosition(position).toString()
+                Log.d(LOG_TAG, "Spinner selected: $category")
+                getSources(category)
+            }
 
-
-        // RecyclerView
-        val sources = getSources()
-        sourcesRecyclerView.adapter = SourcesAdapter(this, sources)
-        sourcesRecyclerView.layoutManager = LinearLayoutManager(this)
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
 
         // Button
         skipBtn.setOnClickListener {
-            Log.d("SOURCES PAGE", "BUTTON - skip button clicked")
+            Log.d(LOG_TAG, "BUTTON - skip button clicked")
+            val searchResultIntent = Intent(this@SourcesActivity, SearchResultsActivity::class.java)
+            searchResultIntent.putExtra("SearchTerm", searchTerm)
+                              .putExtra("Source", "")
+            startActivity(searchResultIntent)
         }
-
     }
 
-    private fun getSources() : List<Sources> {
-        Log.d("SOURCES PAGE", "API - getSources()")
-        return listOf(
-            Sources("ABC News (AU)",  "Australia's most trusted source of local, national and world news. Comprehensive, independent, in-depth analysis, the latest business, sport, weather and more."),
-            Sources("Ars Technica",  "The PC enthusiast's resource. Power users and the tools they love, without computing religion."),
-            Sources("Associated Press",  "The AP delivers in-depth coverage on the international, politics, lifestyle, business, and entertainment news."),
-            Sources("BBC News",  "Use BBC News for up-to-the-minute news, breaking news, video, audio and feature stories. BBC News provides trusted World and UK news as well as local and regional perspectives. Also entertainment, business, science, technology and health news."),
-            Sources("Bleacher Report",  "Sports journalists and bloggers covering NFL, MLB, NBA, NHL, MMA, college football and basketball, NASCAR, fantasy sports and more. News, photos, mock drafts, game scores, player profiles and more!"),
-            Sources("Business Insider",  "Business Insider is a fast-growing business site with deep financial, media, tech, and other industry verticals. Launched in 2007, the site is now the largest business news site on the web."),
-            Sources("CNN",  "View the latest news and breaking news today for U.S., world, weather, entertainment, politics and health at CNN"),
-        )
-    }
 
-    private fun getCategories() : List<String> {
-        Log.d("SOURCES PAGE", "API - getCategories()")
-        return listOf(
-            "Business",
-            "Entertainment",
-            "General",
-            "Health",
-            "Science",
-            "Sports",
-            "Technology"
-        )
+    private fun getSources(category : String) {
+        Log.d(LOG_TAG, "API - getSources($category)")
+
+        progressBar.isVisible = true
+
+        // Coroutines
+        CoroutineScope(Dispatchers.IO).launch {
+            val sources = ApiManager(this@SourcesActivity).getSources(category)
+            withContext(Dispatchers.Main) {
+                // RecyclerView
+                sourcesRecyclerView.adapter = SourcesAdapter(this@SourcesActivity, sources, searchTerm)
+                sourcesRecyclerView.layoutManager = LinearLayoutManager(this@SourcesActivity)
+
+                progressBar.isVisible = false
+            }
+        }
     }
 }

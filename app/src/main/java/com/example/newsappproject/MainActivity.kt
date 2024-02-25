@@ -9,6 +9,8 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 
+private const val LOG_TAG = "HOME PAGE"
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var searchEditText: EditText
@@ -26,34 +28,39 @@ class MainActivity : AppCompatActivity() {
         topHeadlinesBtn = findViewById(R.id.TopHeadlinesButton)
         newsByLocationBtn = findViewById(R.id.NewsByLocationButton)
 
+        val sharedPrefsMainActivity = getSharedPreferences("MainActivity", MODE_PRIVATE)
+
 
         // Text Watchers
         searchEditText.addTextChangedListener(textWatcher)
+        searchEditText.setText(sharedPrefsMainActivity.getString("searchTerm", ""))
+        searchBtn.isEnabled = searchEditText.text.toString().isNotBlank()
 
 
         // Button onClickListeners
         searchBtn.setOnClickListener {
-            Log.d("HOME PAGE", "BUTTON - Search button clicked")
+            Log.d(LOG_TAG, "BUTTON - Search button clicked")
             if (searchBtn.isEnabled) {
                 val searchResultIntent = Intent(this@MainActivity, SourcesActivity::class.java)
                 val searchTerm : String = searchEditText.text.toString()
-                Log.d("HOME PAGE", "SEARCH - Search term: '$searchTerm'")
+                Log.d(LOG_TAG, "SEARCH - Search term: '$searchTerm'")
+                sharedPrefsMainActivity.edit().putString("searchTerm", searchTerm).apply()
                 searchResultIntent.putExtra("SearchTerm", searchTerm)
                 startActivity(searchResultIntent)
             }
         }
 
         topHeadlinesBtn.setOnClickListener {
-            Log.d("HOME PAGE", "BUTTON - Top Headlines button clicked")
-
+            Log.d(LOG_TAG, "BUTTON - Top Headlines button clicked")
+            val topHeadlinesActivityIntent = Intent(this@MainActivity, TopHeadlinesActivity::class.java)
+            startActivity(topHeadlinesActivityIntent)
         }
 
         newsByLocationBtn.setOnClickListener {
-            Log.d("HOME PAGE", "BUTTON - News By Location button clicked")
-
+            Log.d(LOG_TAG, "BUTTON - News By Location button clicked")
+            val mapsActivityIntent = Intent(this@MainActivity, MapsActivity::class.java)
+            startActivity(mapsActivityIntent)
         }
-
-
     }
 
     private val textWatcher : TextWatcher = object : TextWatcher {

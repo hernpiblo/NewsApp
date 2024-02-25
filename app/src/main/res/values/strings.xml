@@ -7,4 +7,30 @@
     <string name="search_for">Search for</string>
     <string name="skip">Skip</string>
     <string name="sources">Sources</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="show_news_for">Show news for</string>
+    <string name="no_news_for">No news for</string>
+    <string name="gwu">GWU</string>
+    <string name="thumbnail_of_article">Thumbnail of article</string>
+    <string name="right_angle_bracket">right angle bracket</string>
+    <string name="viewing_news_for">Viewing news for</string>
+    <string name="category">Category</string>
+    <string name="no_title">No title available</string>
+    <string name="no_source">No source available</string>
+    <string name="no_description">No description available</string>
+    <string name="_1_1">1 / 1</string>
+    <string name="navigate_back">Navigate back</string>
+    <string name="navigate_forward">Navigate forward</string>
+    <string name="page_number_text">%1$s / %2$s</string>
+    <string name="news_for">News for</string>
+    <string name="source_news_for">%1$s news for</string>
+    <string-array name="categories">
+        <item>Business</item>
+        <item>Entertainment</item>
+        <item>General</item>
+        <item>Health</item>
+        <item>Science</item>
+        <item>Sports</item>
+        <item>Technology</item>
+    </string-array>
 </resources>

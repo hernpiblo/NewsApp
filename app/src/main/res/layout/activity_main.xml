@@ -42,8 +42,9 @@
         android:id="@+id/TopHeadlinesButton"
         android:layout_width="190dp"
         android:layout_height="100dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="20dp"
+        android:background="@drawable/left_rounded_button"
         android:text="@string/top_headlines"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,10 +54,12 @@
         android:id="@+id/NewsByLocationButton"
         android:layout_width="190dp"
         android:layout_height="100dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/right_rounded_button"
         android:text="@string/news_by_location"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/TopHeadlinesButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/TopHeadlinesButton" />
+        app:layout_constraintTop_toTopOf="@+id/TopHeadlinesButton"
+        app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>
